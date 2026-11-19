@@ -136,7 +136,7 @@ Simulateur_panne/
 
 <p align="center">
   <a href="Hardware_KiCad/exports/Schema_Simulateur_panne.pdf">
-    <img src="Hardware_KiCad/exports/Schema_Simulateur_panne.png" alt="Schéma du simulateur de pannes" width="900">
+    <img src="Simulateur_panne/Hardware_KiCad/exports/Schema_Simulateur_panne.png" alt="Schéma du simulateur de pannes" width="900">
   </a>
   <br><em>Schéma complet (cliquer pour la version PDF)</em>
 </p>
