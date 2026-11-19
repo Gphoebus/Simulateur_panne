@@ -556,6 +556,14 @@
       {
         "netclass": "Puissance_vcc",
         "pattern": "VCC"
+      },
+      {
+        "netclass": "Puissance_vcc",
+        "pattern": "+3V3"
+      },
+      {
+        "netclass": "Puissance_vcc",
+        "pattern": "+5V"
       }
     ]
   },
@@ -649,6 +657,12 @@
           "label": "#",
           "name": "${ITEM_NUMBER}",
           "show": false
+        },
+        {
+          "group_by": false,
+          "label": "JLCPCB",
+          "name": "JLCPCB",
+          "show": true
         }
       ],
       "filter_string": "",

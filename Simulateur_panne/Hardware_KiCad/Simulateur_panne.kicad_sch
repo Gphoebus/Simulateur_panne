@@ -8089,6 +8089,17 @@
 				)
 			)
 		)
+		(property "JLCPCB" "C28695"
+			(at 30.48 195.58 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
 		(pin "2"
 			(uuid "a63df78f-0198-483f-bd1c-653e317d3e76")
 		)
@@ -11878,6 +11889,17 @@
 				)
 			)
 		)
+		(property "JLCPCB" "C73936"
+			(at 292.1 60.96 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
 		(pin "1"
 			(uuid "7e676f5a-703c-4cdc-9309-f2e34327e436")
 		)
@@ -12089,6 +12111,17 @@
 		)
 		(property "Description" ""
 			(at 33.02 254 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "JLCPCB" "C72334"
+			(at 33.02 254 0)
+			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -13854,7 +13887,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Fuse:Fuseholder_Cylinder-5x20mm_Schurter_0031_8201_Horizontal_Open"
+		(property "Footprint" "Varistor:RV_Disc_D9mm_W3.6mm_P5mm"
 			(at 52.07 53.34 0)
 			(hide yes)
 			(show_name no)
@@ -13877,8 +13910,9 @@
 				)
 			)
 		)
-		(property "Description" ""
+		(property "Description" "Resettable fuse, polymeric positive temperature coefficient"
 			(at 50.8 48.26 0)
+			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -14263,6 +14297,17 @@
 		)
 		(property "Description" ""
 			(at 251.46 43.18 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "JLCPCB" "C37208"
+			(at 251.46 43.18 0)
+			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects

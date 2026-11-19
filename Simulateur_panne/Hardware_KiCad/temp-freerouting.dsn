@@ -36,13 +36,15 @@
     )
   )
   (placement
-    (component "Fuse:Fuseholder_Cylinder-5x20mm_Schurter_0031_8201_Horizontal_Open"
-      (place F1 139550 -147450 front 0 (PN "MF-R110 (1,1 A)"))
+    (component logo:logo_qr_code_simulateur_panne
+      (place G2 126100 -64200 front 0 (PN LOGO))
+      (place REF** 93600 -136525 back 0 (PN "WEEE-Logo_4.2x6mm_SilkScreen"))
+      (place G1 126153.234 -63234.883 back 0 (PN LOGO))
     )
     (component LED_THT:LED_D3.0mm
       (place D6 125310 -48725 front 0 (PN "LED orange"))
       (place D9 150830 -48725 front 0 (PN "LED rouge"))
-      (place D3 100350 -48700 front 0 (PN "LED verte ON"))
+      (place D3 100350 -48725 front 0 (PN "LED verte ON"))
       (place D11 167375 -48725 front 0 (PN "LED rouge"))
       (place D10 159285 -48725 front 0 (PN "LED orange"))
       (place D5 117510 -48725 front 0 (PN "LED rouge"))
@@ -61,7 +63,7 @@
       (place JP1 110450 -66240 front 180 (PN "LEDs ON/OFF"))
     )
     (component "Diode_THT:D_DO-41_SOD81_P10.16mm_Horizontal"
-      (place D2 117000 -118380 front -90 (PN 1N5819))
+      (place D2 117675 -120605 front -90 (PN 1N5819))
     )
     (component "Relay_THT:Relay_SPDT_Omron_G5V-1"
       (place K8 140250 -83385 front 0 (PN "JQC-3FF-005-1Z"))
@@ -73,6 +75,9 @@
       (place K2 140250 -60165 front 0 (PN "JQC-3FF-005-1Z"))
       (place K4 140250 -128135 front 0 (PN "JQC-3FF-005-1Z"))
     )
+    (component Varistor:RV_Disc_D9mm_W3.6mm_P5mm
+      (place F1 144225 -147250 front 0 (PN "MF-R110 (1,1 A)"))
+    )
     (component Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal
       (place R9 121050 -86110 front 90 (PN 1k))
       (place R8 117000 -86110 front 90 (PN 1k))
@@ -82,7 +87,7 @@
       (place R3 96750 -86110 front 90 (PN 1k))
       (place R6 108900 -86110 front 90 (PN 1k))
       (place R10 125100 -86110 front 90 (PN 1k))
-      (place R1 123225 -128205 front 90 (PN 10k))
+      (place R1 123900 -130430 front 90 (PN 10k))
       (place R2 92700 -86110 front 90 (PN 1k))
     )
     (component "Package_TO_SOT_SMD:SOT-23"
@@ -98,17 +103,17 @@
       (place J6 174525 -115235 front 90 (PN "VOIE 3"))
     )
     (component Connector_BarrelJack:BarrelJack_Horizontal
-      (place J1 100225 -64917.5 front 0 (PN "Jack 5V 2A"))
+      (place J1 100500 -64867.5 front 0 (PN "Jack 5V 2A"))
     )
     (component "Diode_THT:D_DO-15_P10.16mm_Horizontal"
-      (place D1 129250 -128675 front 90 (PN "P6KE6.8A (TVS)"))
+      (place D1 129925 -130900 front 90 (PN "P6KE6.8A (TVS)"))
     )
     (component LED_THT:LED_D3.0mm::1
       (place D7 136975 -48725 front 180 (PN "LED rouge"))
       (place D4 111765 -48725 front 180 (PN "LED orange"))
     )
     (component "Simulateur_panne:ESP32-C3_SuperMini_Socket"
-      (place U1 106780 -92000 front -90 (PN "ESP32-C3 SuperMini"))
+      (place U1 107100 -91950 front -90 (PN "ESP32-C3 SuperMini"))
     )
     (component "Package_DIP:DIP-18_W7.62mm_Socket"
       (place U2 121130 -90880 front 0 (PN ULN2803A))
@@ -126,26 +131,11 @@
       (place J3 103775 -115175 front -90 (PN Extension))
     )
     (component Capacitor_THT:CP_Radial_D5.0mm_P2.00mm
-      (place C4 114175 -109900 front -90 (PN "10µF 10V"))
+      (place C4 112300 -114400 front -90 (PN "10µF 10V"))
     )
   )
   (library
-    (image "Fuse:Fuseholder_Cylinder-5x20mm_Schurter_0031_8201_Horizontal_Open"
-      (outline (polygon signal 0  24245 -5045  -1745 -5045  -1745 5045  24245 5045))
-      (outline (path signal 120  -110 4910  22610 4910))
-      (outline (path signal 120  -110 1750  -110 4910))
-      (outline (path signal 120  -110 -4910  -110 -1750))
-      (outline (path signal 120  -110 -4910  22610 -4910))
-      (outline (path signal 120  22610 1750  22610 4910))
-      (outline (path signal 120  22610 -4910  22610 -1750))
-      (outline (path signal 100  0 4800  0 -4800))
-      (outline (path signal 100  0 -4800  22500 -4800))
-      (outline (path signal 100  22500 4800  0 4800))
-      (outline (path signal 100  22500 -4800  22500 4800))
-      (pin Round[A]Pad_3000.000000_um 1 0 0)
-      (pin Round[A]Pad_3000.000000_um 2 22500 0)
-      (keepout "" (circle F.Cu 3200 11250 0))
-      (keepout "" (circle B.Cu 3200 11250 0))
+    (image logo:logo_qr_code_simulateur_panne
     )
     (image LED_THT:LED_D3.0mm
       (outline (polygon signal 0  3685 -2205  -1145 -2205  -1145 2205  3685 2205))
@@ -331,6 +321,19 @@
       (pin Round[A]Pad_2000.000000_um 6 5080 -10160)
       (pin Round[A]Pad_2000.000000_um 9 5080 -2540)
       (pin Round[A]Pad_2000.000000_um 10 5080 0)
+    )
+    (image Varistor:RV_Disc_D9mm_W3.6mm_P5mm
+      (outline (polygon signal 0  7245 -2745  -2245 -2745  -2245 1345  7245 1345))
+      (outline (path signal 150  -2000 1100  -2000 -2500))
+      (outline (path signal 150  -2000 1100  7000 1100))
+      (outline (path signal 150  -2000 -2500  7000 -2500))
+      (outline (path signal 150  7000 1100  7000 -2500))
+      (outline (path signal 100  -2000 1100  -2000 -2500))
+      (outline (path signal 100  -2000 1100  7000 1100))
+      (outline (path signal 100  -2000 -2500  7000 -2500))
+      (outline (path signal 100  7000 1100  7000 -2500))
+      (pin Round[A]Pad_1600.000000_um 1 0 0)
+      (pin Round[A]Pad_1600.000000_um 2 5000 -1400)
     )
     (image Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal
       (outline (polygon signal 0  -1045 -1495  -1045 1495  11205 1495  11205 -1495))
@@ -1130,11 +1133,6 @@
       (shape (circle B.Cu 2600))
       (attach off)
     )
-    (padstack Round[A]Pad_3000.000000_um
-      (shape (circle F.Cu 3000))
-      (shape (circle B.Cu 3000))
-      (attach off)
-    )
     (padstack Oval[A]Pad_1700.000000x1700.000000_um
       (shape (path F.Cu 1700  0 0  0 0))
       (shape (path B.Cu 1700  0 0  0 0))
@@ -1460,13 +1458,13 @@
     (net "unconnected-(K4-Pad1)"
       (pins K4-1)
     )
-    (class kicad_default +3V3 +5V /5V_MOD /BTN_RAZ /CH1_FLT /CH1_IN /CH1_OUT
-      /CH1_X /CH2_FLT /CH2_IN /CH2_OUT /CH2_X /CH3_FLT /CH3_IN /CH3_OUT /CH3_X
-      /CH4_FLT /CH4_IN /CH4_OUT /CH4_X /CMD_1A /CMD_1B /CMD_2A /CMD_2B /CMD_3A
-      /CMD_3B /CMD_4A /CMD_4B /COIL_1A /COIL_1B /COIL_2A /COIL_2B /COIL_3A
-      /COIL_3B /COIL_4A /COIL_4B /EXT_IO2 /EXT_RX /EXT_TX /GATE_Q1 /LA_1A
-      /LA_1B /LA_2A /LA_2B /LA_3A /LA_3B /LA_4A /LA_4B /LED_COM /LED_PWR /VIN_F
-      /VIN_RAW "unconnected-(K2-Pad1)" "unconnected-(K4-Pad1)" "unconnected-(K6-Pad1)"
+    (class kicad_default /5V_MOD /BTN_RAZ /CH1_FLT /CH1_IN /CH1_OUT /CH1_X
+      /CH2_FLT /CH2_IN /CH2_OUT /CH2_X /CH3_FLT /CH3_IN /CH3_OUT /CH3_X /CH4_FLT
+      /CH4_IN /CH4_OUT /CH4_X /CMD_1A /CMD_1B /CMD_2A /CMD_2B /CMD_3A /CMD_3B
+      /CMD_4A /CMD_4B /COIL_1A /COIL_1B /COIL_2A /COIL_2B /COIL_3A /COIL_3B
+      /COIL_4A /COIL_4B /EXT_IO2 /EXT_RX /EXT_TX /GATE_Q1 /LA_1A /LA_1B /LA_2A
+      /LA_2B /LA_3A /LA_3B /LA_4A /LA_4B /LED_COM /LED_PWR /VIN_F /VIN_RAW
+      "unconnected-(K2-Pad1)" "unconnected-(K4-Pad1)" "unconnected-(K6-Pad1)"
       "unconnected-(K8-Pad1)" "unconnected-(U1-GPIO8{slash}LED-Pad13)"
       (circuit
         (use_via "Via[0-1]_600:300_um")
@@ -1474,6 +1472,15 @@
       (rule
         (width 300)
         (clearance 200)
+      )
+    )
+    (class Puissance_vcc,Default +3V3 +5V
+      (circuit
+        (use_via "Via[0-1]_800:300_um")
+      )
+      (rule
+        (width 800)
+        (clearance 500)
       )
     )
     (class Puissance_GND,Default GND
