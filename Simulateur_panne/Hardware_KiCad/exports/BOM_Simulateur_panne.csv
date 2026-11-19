@@ -1,0 +1,25 @@
+﻿Repères;Qté;Valeur;Description;Empreinte
+C1;1;470µF 10V;Condensateur électrolytique;Capacitor_THT:CP_Radial_D8.0mm_P3.50mm
+C2,C3;2;100nF;Condensateur céramique 50 V;Capacitor_THT:C_Disc_D5.0mm_W2.5mm_P5.00mm
+C4;1;10µF 10V;Condensateur électrolytique;Capacitor_THT:CP_Radial_D5.0mm_P2.00mm
+D1;1;P6KE6.8A (TVS);Diode TVS unidirectionnelle 600 W;Diode_THT:D_DO-15_P10.16mm_Horizontal
+D2;1;1N5819;Diode Schottky 1 A 40 V;Diode_THT:D_DO-41_SOD81_P10.16mm_Horizontal
+D3;1;LED verte ON;LED 3 mm;LED_THT:LED_D3.0mm
+D4,D6,D8,D10;4;LED orange;LED 3 mm;LED_THT:LED_D3.0mm
+D5,D7,D9,D11;4;LED rouge;LED 3 mm;LED_THT:LED_D3.0mm
+F1;1;MF-R110 (1,1 A);Fusible réarmable PTC radial;Fuse:Fuse_Bourns_MF-RHT100
+J1;1;Jack 5V 2A;Embase jack DC 5,5 x 2,1 mm;Connector_BarrelJack:BarrelJack_Horizontal
+J2;1;Bornier 5V;Bornier à vis 2 pts pas 5,08;TerminalBlock_Phoenix:TerminalBlock_Phoenix_MKDS-1,5-2-5.08_1x02_P5.08mm_Horizontal
+J3;1;Extension;Barrette mâle 1x06 pas 2,54;Connector_PinHeader_2.54mm:PinHeader_1x06_P2.54mm_Vertical
+J4;1;VOIE 1;Bornier à vis 3 pts pas 5,08;TerminalBlock_Phoenix:TerminalBlock_Phoenix_MKDS-1,5-3-5.08_1x03_P5.08mm_Horizontal
+J5;1;VOIE 2;Bornier à vis 3 pts pas 5,08;TerminalBlock_Phoenix:TerminalBlock_Phoenix_MKDS-1,5-3-5.08_1x03_P5.08mm_Horizontal
+J6;1;VOIE 3;Bornier à vis 3 pts pas 5,08;TerminalBlock_Phoenix:TerminalBlock_Phoenix_MKDS-1,5-3-5.08_1x03_P5.08mm_Horizontal
+J7;1;VOIE 4;Bornier à vis 3 pts pas 5,08;TerminalBlock_Phoenix:TerminalBlock_Phoenix_MKDS-1,5-3-5.08_1x03_P5.08mm_Horizontal
+JP1;1;LEDs ON/OFF;Barrette 1x02 + cavalier;Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical
+K1,K2,K3,K4,K5,K6,K7,K8;8;G5V-1;Relais signal Omron G5V-1 5 V DC (SPDT, 1 A 24 V DC);Relay_THT:Relay_SPDT_Omron_G5V-1
+Q1;1;AO3401A;MOSFET canal P 30 V 4 A (protection inversion);Package_TO_SOT_SMD:SOT-23
+R1;1;10k;Résistance 1/4 W 5 %;Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal
+R2,R3,R4,R5,R6,R7,R8,R9,R10;9;1k;Résistance 1/4 W 5 %;Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal
+SW1;1;RAZ pannes;Bouton poussoir 6x6 mm;Button_Switch_THT:SW_PUSH_6mm
+U1;1;ESP32-C3 SuperMini;Module ESP32-C3 SuperMini + 2 barrettes femelles 1x08;Simulateur_panne:ESP32-C3_SuperMini_Socket
+U2;1;ULN2803A;Réseau 8 darlingtons (DIP-18 + support);Package_DIP:DIP-18_W7.62mm_Socket

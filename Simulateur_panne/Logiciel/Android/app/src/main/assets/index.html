@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Simulateurs de pannes</title>
+<style>
+:root{
+  --bg:#eef1f5; --card:#fff; --ink:#17212b; --mute:#66737f; --line:#dde3ea;
+  --brand:#0d3b66; --brand2:#145da0;
+  --in:#1565c0; --out:#e65100;
+  --ok:#2e7d32; --cut:#f9a825; --force:#c62828; --int:#6a1b9a;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.35 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+button{font:inherit;border:0;cursor:pointer}
+header{position:sticky;top:0;z-index:5;background:var(--brand);color:#fff;padding:10px 12px;display:flex;align-items:center;gap:8px;box-shadow:0 2px 6px #0003}
+header h1{font-size:17px;margin:0;font-weight:700;flex:1;line-height:1.15}
+header h1 small{display:block;font-weight:400;font-size:12px;opacity:.85}
+.hbtn{background:#ffffff1f;color:#fff;border-radius:10px;min-width:40px;height:40px;font-size:20px;display:flex;align-items:center;justify-content:center;padding:0 10px}
+.hbtn.txt{font-size:14px;font-weight:600}
+main{padding:10px 10px 96px}
+.banner{background:#fff3cd;border:1px solid #f0d27a;border-radius:12px;padding:10px 12px;margin-bottom:10px;display:flex;gap:10px;align-items:center}
+.banner.err{background:#fde7e7;border-color:#f3b3b3}
+.banner p{margin:0;flex:1}
+.empty{text-align:center;color:var(--mute);padding:40px 16px}
+.empty b{display:block;color:var(--ink);font-size:17px;margin-bottom:6px}
+.card{background:var(--card);border-radius:16px;margin-bottom:12px;box-shadow:0 1px 3px #0002;overflow:hidden;border:2px solid transparent}
+.card.fault{border-color:var(--force)}
+.card.off{opacity:.72}
+.chead{display:flex;align-items:flex-start;gap:10px;padding:12px 12px 8px}
+.dot{width:12px;height:12px;border-radius:50%;margin-top:5px;flex:none;background:#9aa5b1}
+.dot.ready{background:#2ecc71;box-shadow:0 0 0 3px #2ecc7133}
+.dot.connecting{background:#f1c40f;animation:pulse 1s infinite}
+@keyframes pulse{50%{opacity:.3}}
+.ctitle{flex:1;min-width:0}
+.ctitle b{font-size:17px;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ctitle span{color:var(--mute);font-size:13px}
+.nfault{background:var(--force);color:#fff;border-radius:20px;font-size:12px;font-weight:700;padding:3px 9px;white-space:nowrap}
+.nfault.zero{background:#e3f2e5;color:var(--ok)}
+.msg{margin:0 12px 10px;padding:8px 10px;border-radius:10px;background:#f4f6f8;color:var(--mute);font-size:13px;display:flex;gap:8px;align-items:center}
+.msg.warn{background:#fff3cd;color:#7a5a00}
+.msg.err{background:#fde7e7;color:#a61b1b}
+.msg button{margin-left:auto}
+.voie{border-top:1px solid var(--line);padding:10px 12px}
+.vhead{display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap}
+.vnum{font-size:12px;color:var(--mute);font-weight:600}
+.tag{font-size:11px;font-weight:800;letter-spacing:.04em;border-radius:6px;padding:2px 7px;color:#fff}
+.tag.E{background:var(--in)} .tag.S{background:var(--out)}
+.vid{font-weight:800;font-family:ui-monospace,Consolas,monospace;font-size:15px}
+.vlb{color:var(--mute);font-size:13px;flex-basis:100%}
+.modes{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}
+.mb{background:#f0f2f5;color:#33414e;border-radius:10px;padding:10px 2px;font-size:12.5px;font-weight:700;min-height:46px;line-height:1.1;border:2px solid transparent}
+.mb:active{transform:scale(.96)}
+.mb.on.m0{background:var(--ok);color:#fff}
+.mb.on.m1{background:var(--cut);color:#222}
+.mb.on.m2{background:var(--force);color:#fff}
+.mb.on.m3,.mb.on.m4{background:var(--int);color:#fff}
+.mb.pend{border-color:var(--brand2);animation:pulse .8s infinite}
+.mb:disabled{opacity:.45}
+.vstate{font-size:12.5px;margin-top:6px;color:var(--mute)}
+.vstate b.m1{color:#9a6b00} .vstate b.m2{color:var(--force)} .vstate b.m3,.vstate b.m4{color:var(--int)} .vstate b.m0{color:var(--ok)}
+.unused{border-top:1px solid var(--line);padding:6px 12px;color:#a0aab4;font-size:12.5px}
+.cfoot{display:flex;border-top:1px solid var(--line)}
+.cfoot button{flex:1;background:none;padding:11px 4px;color:var(--brand2);font-weight:700;font-size:13.5px}
+.cfoot button+button{border-left:1px solid var(--line)}
+.fab{position:fixed;left:12px;right:12px;bottom:12px;z-index:6;background:var(--force);color:#fff;border-radius:14px;padding:15px;font-size:16px;font-weight:800;letter-spacing:.03em;box-shadow:0 4px 14px #c6282866}
+.fab:disabled{background:#9aa5b1;box-shadow:none}
+/* formulaires */
+.panel{background:var(--card);border-radius:16px;padding:12px;margin-bottom:12px;box-shadow:0 1px 3px #0002}
+.panel h2{font-size:15px;margin:0 0 10px;color:var(--brand)}
+label{display:block;font-size:12.5px;color:var(--mute);font-weight:600;margin:8px 0 3px}
+input,select{width:100%;font:inherit;padding:10px;border:1px solid #c9d2dc;border-radius:10px;background:#fff;color:var(--ink)}
+input:disabled,select:disabled{background:#f2f4f7;color:#8995a0}
+.row{display:flex;gap:8px}
+.row>*{flex:1}
+.vcfg{border:1px solid var(--line);border-radius:12px;padding:8px 10px 10px;margin-top:10px}
+.vcfg h3{margin:0;font-size:14px;display:flex;align-items:center;gap:8px}
+.btn{display:block;width:100%;border-radius:12px;padding:13px;font-weight:700;margin-top:10px;background:var(--brand2);color:#fff;font-size:15px}
+.btn.sec{background:#e6edf5;color:var(--brand)}
+.btn.danger{background:#fde7e7;color:#a61b1b}
+.btn:disabled{opacity:.5}
+.hint{font-size:12.5px;color:var(--mute);margin:6px 0 0}
+.count{float:right;font-weight:400}
+/* liste de recherche */
+.dev{display:flex;align-items:center;gap:10px;background:var(--card);border-radius:14px;padding:12px;margin-bottom:8px;box-shadow:0 1px 2px #0002}
+.dev .info{flex:1;min-width:0}
+.dev b{display:block}
+.dev small{color:var(--mute)}
+.badge{font-size:11px;font-weight:800;border-radius:6px;padding:3px 7px;background:#e3f2fd;color:var(--in)}
+.badge.new{background:#fff3cd;color:#7a5a00}
+.badge.known{background:#eceff1;color:#607d8b}
+.bars{display:flex;gap:2px;align-items:flex-end;height:16px}
+.bars i{width:4px;background:#cfd8dc;border-radius:1px}
+.bars i.on{background:var(--brand2)}
+.spin{width:18px;height:18px;border:3px solid #ffffff55;border-top-color:#fff;border-radius:50%;animation:rot 1s linear infinite;display:inline-block}
+@keyframes rot{to{transform:rotate(360deg)}}
+/* fenetres */
+#modal{position:fixed;inset:0;background:#0007;z-index:20;display:none;align-items:flex-end;justify-content:center}
+#modal.show{display:flex}
+.sheet{background:#fff;width:100%;max-width:520px;border-radius:18px 18px 0 0;padding:16px 16px 20px;max-height:90vh;overflow:auto}
+.sheet h2{margin:0 0 6px;font-size:18px}
+.sheet p{margin:6px 0;color:#3d4a56}
+.sheet .row .btn{margin-top:14px}
+#toast{position:fixed;left:50%;bottom:86px;transform:translateX(-50%);background:#17212bee;color:#fff;padding:10px 16px;border-radius:12px;z-index:30;font-size:14px;max-width:90%;text-align:center;display:none}
+.menu button{display:block;width:100%;text-align:left;background:none;padding:14px 6px;border-bottom:1px solid var(--line);font-size:16px}
+.menu button.red{color:#b71c1c}
+.legend{font-size:12px;color:var(--mute);margin:4px 2px 10px;line-height:1.5}
+.demo{background:#6a1b9a;color:#fff;text-align:center;font-size:12px;padding:4px}
+</style>
+</head>
+<body>
+<div id="demo" class="demo" style="display:none">MODE DÉMONSTRATION (navigateur) — simulateurs fictifs</div>
+<header id="hdr"></header>
+<main id="main"></main>
+<button id="fab" class="fab" onclick="app.allNormalWorkshop()">TOUT NORMAL — ATELIER</button>
+<div id="modal" onclick="if(event.target===this)app.closeModal()"><div class="sheet" id="sheet"></div></div>
+<div id="toast"></div>
+
+<script>
+"use strict";
+/* =====================================================================
+   Simulateurs de pannes - application enseignant
+   Phoebus du F.L.A.L. - Lycée de la Borde Basse - STI2D / NSI
+   Interface HTML/JS ; le Bluetooth est assuré par le code Java (pont SPBLE).
+   ===================================================================== */
+const MODES = [
+  {lb:"Normal",    st:"NORMAL",                 desc:"liaison normale IN → OUT"},
+  {lb:"Coupure",   st:"COUPURE",                desc:"fil coupé, OUT en l'air"},
+  {lb:"Forçage",   st:"FORÇAGE",                desc:"OUT relié à la borne FLT"},
+  {lb:"Coupure ~", st:"COUPURE INTERMITTENTE",  desc:"faux contact aléatoire"},
+  {lb:"Forçage ~", st:"FORÇAGE INTERMITTENT",   desc:"forçage aléatoire"}
+];
+const LIM = {name:20, loc:24, id:12, label:24};
+
+/* ------------------------- outils ------------------------- */
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const enc = new TextEncoder();
+function clean(s, maxBytes){            // retire '|' et tronque en octets UTF-8 (comme le boîtier)
+  s = String(s ?? "").replace(/\|/g, "/").replace(/[\x00-\x1f]/g, " ").trim();
+  while (enc.encode(s).length > maxBytes) s = s.slice(0, -1);
+  return s.trim();
+}
+function fmtUp(sec){
+  sec = +sec || 0;
+  const h = Math.floor(sec/3600), m = Math.floor(sec%3600/60);
+  return h ? `${h} h ${String(m).padStart(2,"0")}` : `${m} min`;
+}
+
+/* ------------------------- pont Bluetooth ------------------------- */
+let ble = window.SPBLE || null;          // fourni par l'application Android
+
+/* ------------------------- application ------------------------- */
+const app = {
+  store: {version:1, sims:[]},          // liste des simulateurs (persistée)
+  rt: {},                               // état temps réel par adresse MAC
+  view: "dash", editMac: null,
+  scan: {on:false, list:{}},
+  btOn: true, permOk: true,
+  pendingPin: {}, waitCfg: {},
+
+  init(){
+    if (!ble){ ble = new MockBLE(); $("demo").style.display = "block"; }
+    try { const d = JSON.parse(ble.loadData() || "null"); if (d && Array.isArray(d.sims)) this.store = d; } catch(e){}
+    this.store.sims.forEach(s => this.rtOf(s.mac));
+    try { const st = JSON.parse(ble.getStatus()); this.permOk = st.perm; this.btOn = st.bt; } catch(e){}
+    this.render();
+    setTimeout(() => this.refreshAll(), 300);       // interroge les simulateurs au démarrage
+  },
+  save(){ ble.saveData(JSON.stringify(this.store)); },
+  rtOf(mac){ return this.rt[mac] || (this.rt[mac] = {conn:"offline", auth:null, cfg:null, st:null, pend:{}, err:""}); },
+  sim(mac){ return this.store.sims.find(s => s.mac === mac); },
+
+  /* ---------- événements venant de Java ---------- */
+  onEvent(e){
+    const r = e.mac ? this.rtOf(e.mac) : null;
+    switch (e.t){
+      case "perm": this.permOk = e.ok; if (e.ok) this.refreshAll(); break;
+      case "bt": this.btOn = e.on; if (e.on) this.refreshAll(); break;
+      case "conn":
+        r.conn = e.s;
+        if (e.s !== "ready") { r.auth = null; r.pend = {}; }
+        r.err = e.err || "";
+        break;
+      case "cfg": r.cfg = this.parseCfg(e.d); if (this.waitCfg[e.mac]) { delete this.waitCfg[e.mac]; } break;
+      case "st": r.st = this.parseSt(e.d); r.pend = {}; break;
+      case "rsp": this.onResp(e.mac, e.d); break;
+      case "scan": this.scan.list[e.mac] = {mac:e.mac, name:e.name || "?", rssi:e.rssi, at:Date.now()}; if (this.view==="scan") this.renderScan(); return;
+      case "scanend": this.scan.on = false; break;
+      case "toast": this.toast(e.m); return;
+    }
+    this.render();
+  },
+  parseCfg(d){
+    const f = String(d).split("|");
+    if (f[0] !== "CFG" || f.length < 19) return null;
+    const v = [];
+    for (let i=0;i<4;i++) v.push({t:f[7+3*i]||"-", id:f[8+3*i]||"", lb:f[9+3*i]||""});
+    return {fw:f[1], mac:f[2], ok:f[3]==="1", name:f[4], loc:f[5], period:+f[6]||2000, v};
+  },
+  parseSt(d){
+    const f = String(d).split("|");
+    if (f[0] !== "ST") return null;
+    return {m:[+f[1],+f[2],+f[3],+f[4]], up:+f[5], nc:+f[6], ok:f[7]==="1"};
+  },
+  onResp(mac, d){
+    const r = this.rtOf(mac), s = this.sim(mac), name = this.title(mac);
+    if (d === "OK AUTH") r.auth = true;
+    else if (d === "ERR AUTH") { r.auth = false; this.toast(`${name} : code PIN refusé`); }
+    else if (d === "OK CFG") { this.toast(`${name} : configuration enregistrée dans le boîtier`); ble.refresh(mac); }
+    else if (d === "OK PIN") {
+      if (s && this.pendingPin[mac]) { s.pin = this.pendingPin[mac]; delete this.pendingPin[mac]; this.save(); }
+      this.toast(`${name} : nouveau code PIN enregistré`);
+    }
+    else if (d === "OK RESETCFG") this.toast(`${name} : configuration du boîtier effacée`);
+    else if (d === "ERR AUTH REQUISE") { r.auth = false; r.pend = {}; this.toast(`${name} : code PIN nécessaire`); }
+    else if (d.startsWith("ERR")) { r.pend = {}; this.toast(`${name} : ${d}`); }
+  },
+
+  /* ---------- actions ---------- */
+  refreshAll(){
+    this.store.sims.forEach(s => {
+      const r = this.rtOf(s.mac);
+      if (r.conn === "ready") ble.refresh(s.mac); else ble.connect(s.mac, s.pin);
+    });
+    this.render();
+  },
+  setMode(mac, v, m){
+    const r = this.rtOf(mac);
+    if (r.conn !== "ready") return this.toast("Simulateur hors ligne");
+    if (r.auth === false) return this.toast("Code PIN refusé : modifiez-le dans la configuration");
+    r.pend[v] = m;
+    ble.command(mac, `SET ${v+1} ${m}`);
+    ble.vibrate(25);
+    this.render();
+  },
+  allNormal(mac){ const r = this.rtOf(mac); if (r.conn === "ready") { ble.command(mac, "ALL 0"); this.toast(`${this.title(mac)} : retour à la normale`); } },
+  allNormalWorkshop(){
+    const ready = this.store.sims.filter(s => this.rtOf(s.mac).conn === "ready");
+    if (!ready.length) return this.toast("Aucun simulateur connecté");
+    this.confirm("Tout remettre à la normale ?", `Toutes les pannes des ${ready.length} simulateur(s) connecté(s) seront supprimées.`, "Tout normal", () => {
+      ready.forEach(s => ble.command(s.mac, "ALL 0"));
+      ble.vibrate(60);
+      this.toast("Retour à la normale envoyé à tout l'atelier");
+    });
+  },
+  identify(mac){ ble.command(mac, "IDENT"); this.toast("La LED du boîtier clignote pendant 6 s"); },
+  reconnect(mac){ const s = this.sim(mac); ble.connect(mac, s.pin); this.rtOf(mac).conn = "connecting"; this.render(); },
+
+  /* ---------- ajout ---------- */
+  openScan(){
+    this.view = "scan"; this.scan = {on:true, list:{}};
+    ble.startScan(10000);
+    this.render();
+  },
+  stopScan(){ ble.stopScan(); this.scan.on = false; },
+  pickDevice(mac){
+    const d = this.scan.list[mac];
+    if (this.sim(mac)) { this.toast("Ce simulateur est déjà dans la liste"); return; }
+    const isNew = /^SP-NEW-/.test(d.name);
+    this.modal(`<h2>Ajouter ${esc(d.name)}</h2>
+      <p>${isNew ? "Boîtier <b>neuf</b> (non configuré) : vous pourrez le nommer et définir ses voies juste après." : "Boîtier déjà configuré : saisissez son code PIN."}</p>
+      <label>Nom affiché dans l'application (facultatif)</label><input id="aAlias" value="" placeholder="nom du boîtier">
+      <label>Code PIN du boîtier</label><input id="aPin" inputmode="numeric" maxlength="8" value="0000">
+      <p class="hint">Code usine : 0000. Appui de 8 s sur le bouton du boîtier pour le réinitialiser.</p>
+      <div class="row"><button class="btn sec" onclick="app.closeModal()">Annuler</button>
+      <button class="btn" onclick="app.addDevice('${esc(mac)}')">Ajouter</button></div>`);
+  },
+  addDevice(mac){
+    const alias = $("aAlias").value.trim(), pin = $("aPin").value.trim();
+    if (!/^\d{4,8}$/.test(pin)) return this.toast("Le code PIN contient 4 à 8 chiffres");
+    this.stopScan();
+    this.store.sims.push({mac, alias, pin});
+    this.save();
+    this.rtOf(mac).conn = "connecting";
+    ble.connect(mac, pin);
+    this.closeModal();
+    this.openEdit(mac);
+  },
+
+  /* ---------- modification / suppression ---------- */
+  openEdit(mac){ this.view = "edit"; this.editMac = mac; this.render(); window.scrollTo(0,0); },
+  back(){
+    if ($("modal").classList.contains("show")) { this.closeModal(); return true; }
+    if (this.view !== "dash") { if (this.view === "scan") this.stopScan(); this.view = "dash"; this.render(); return true; }
+    return false;
+  },
+  saveLocal(){
+    const s = this.sim(this.editMac);
+    const pin = $("ePin").value.trim();
+    if (!/^\d{4,8}$/.test(pin)) { this.toast("Le code PIN contient 4 à 8 chiffres"); return false; }
+    const pinChanged = pin !== s.pin;
+    s.alias = $("eAlias").value.trim(); s.pin = pin;
+    this.save();
+    if (pinChanged) { ble.disconnect(s.mac); setTimeout(() => ble.connect(s.mac, s.pin), 600); return "pin"; }
+    return true;
+  },
+  saveAll(){
+    const res = this.saveLocal();
+    if (!res) return;
+    const mac = this.editMac, r = this.rtOf(mac);
+    if (res === "pin") { this.toast("Code PIN modifié : reconnexion au boîtier…"); this.view = "dash"; this.render(); return; }
+    if (r.conn !== "ready" || r.auth !== true) { this.toast("Enregistré dans l'application (boîtier non joignable)"); this.view="dash"; this.render(); return; }
+    const name = clean($("cName").value, LIM.name);
+    if (!name) return this.toast("Donnez un nom au simulateur");
+    const per = Math.round(parseFloat(String($("cPer").value).replace(",", ".")) * 1000);
+    if (!(per >= 200 && per <= 60000)) return this.toast("Période d'intermittence : 0,2 à 60 s");
+    const f = [name, clean($("cLoc").value, LIM.loc), per];
+    for (let i=0;i<4;i++) f.push($("vt"+i).value, clean($("vi"+i).value, LIM.id), clean($("vl"+i).value, LIM.label));
+    this.waitCfg[mac] = true;
+    ble.writeConfig(mac, f.join("|"));
+    this.view = "dash"; this.render();
+  },
+  changePin(){
+    const mac = this.editMac, r = this.rtOf(mac);
+    if (r.conn !== "ready" || r.auth !== true) return this.toast("Le boîtier doit être connecté");
+    this.modal(`<h2>Nouveau code PIN du boîtier</h2>
+      <p>Il sera exigé par toutes les applications qui pilotent ce simulateur.</p>
+      <label>Nouveau code (4 à 8 chiffres)</label><input id="nPin" inputmode="numeric" maxlength="8">
+      <div class="row"><button class="btn sec" onclick="app.closeModal()">Annuler</button>
+      <button class="btn" onclick="app.doChangePin()">Valider</button></div>`);
+  },
+  doChangePin(){
+    const p = $("nPin").value.trim();
+    if (!/^\d{4,8}$/.test(p)) return this.toast("4 à 8 chiffres");
+    this.pendingPin[this.editMac] = p;
+    ble.command(this.editMac, "PIN " + p);
+    this.closeModal();
+  },
+  askDelete(mac){
+    const r = this.rtOf(mac);
+    this.modal(`<h2>Supprimer « ${esc(this.title(mac))} » ?</h2>
+      <p>Le simulateur sera retiré de la liste de cette application.</p>
+      ${r.conn==="ready" && r.auth ? `<label style="display:flex;gap:8px;align-items:center;font-size:14px;color:#333"><input type="checkbox" id="dReset" style="width:auto"> Effacer aussi la configuration du boîtier (retour usine, pannes supprimées)</label>` : ""}
+      <div class="row"><button class="btn sec" onclick="app.closeModal()">Annuler</button>
+      <button class="btn danger" onclick="app.doDelete('${esc(mac)}')">Supprimer</button></div>`);
+  },
+  doDelete(mac){
+    const reset = $("dReset") && $("dReset").checked;
+    if (reset) ble.command(mac, "RESETCFG"); else if (this.rtOf(mac).conn === "ready") ble.command(mac, "ALL 0");
+    setTimeout(() => ble.disconnect(mac), 400);
+    this.store.sims = this.store.sims.filter(s => s.mac !== mac);
+    delete this.rt[mac];
+    this.save();
+    this.closeModal();
+    this.view = "dash"; this.render();
+    this.toast("Simulateur supprimé de la liste");
+  },
+  cardMenu(mac){
+    const r = this.rtOf(mac);
+    this.modal(`<h2>${esc(this.title(mac))}</h2><div class="menu">
+      <button onclick="app.closeModal();app.openEdit('${mac}')">⚙️ Configurer / modifier</button>
+      <button onclick="app.closeModal();app.identify('${mac}')" ${r.conn!=="ready"?"disabled":""}>💡 Identifier le boîtier (LED)</button>
+      <button onclick="app.closeModal();${r.conn==="ready"?`ble.refresh('${mac}')`:`app.reconnect('${mac}')`}">🔄 ${r.conn==="ready"?"Relire l'état":"Reconnecter"}</button>
+      <button class="red" onclick="app.closeModal();app.askDelete('${mac}')">🗑️ Supprimer de la liste</button></div>`);
+  },
+
+  /* ---------- affichage ---------- */
+  title(mac){ const s = this.sim(mac), r = this.rtOf(mac); return (s && s.alias) || (r.cfg && r.cfg.name) || mac; },
+  faults(mac){ const r = this.rtOf(mac); if (!r.st || !r.cfg) return 0; return r.st.m.filter((m,i) => m !== 0).length; },
+  render(){
+    const h = $("hdr");
+    if (this.view === "dash"){
+      const nf = this.store.sims.reduce((a,s) => a + (this.rtOf(s.mac).conn==="ready" ? this.faults(s.mac) : 0), 0);
+      const nr = this.store.sims.filter(s => this.rtOf(s.mac).conn==="ready").length;
+      h.innerHTML = `<h1>Simulateurs de pannes<small>${nr}/${this.store.sims.length} connecté(s) · ${nf} panne(s) en cours</small></h1>
+        <button class="hbtn" onclick="app.refreshAll()" title="Actualiser">⟳</button>
+        <button class="hbtn" onclick="app.openScan()" title="Ajouter">＋</button>`;
+      $("fab").style.display = this.store.sims.length ? "block" : "none";
+      $("main").innerHTML = this.banners() + this.renderDash();
+    } else if (this.view === "scan"){
+      h.innerHTML = `<button class="hbtn" onclick="app.back()">←</button><h1>Ajouter un simulateur<small>Recherche des boîtiers à proximité</small></h1>
+        ${this.scan.on ? `<span class="spin"></span>` : `<button class="hbtn txt" onclick="app.openScan()">Relancer</button>`}`;
+      $("fab").style.display = "none";
+      this.renderScan();
+    } else if (this.view === "edit"){
+      const s = this.sim(this.editMac);
+      if (!s){ this.view = "dash"; return this.render(); }
+      h.innerHTML = `<button class="hbtn" onclick="app.back()">←</button><h1>Configuration<small>${esc(this.title(s.mac))}</small></h1>`;
+      $("fab").style.display = "none";
+      // ne pas écraser un formulaire en cours de saisie
+      const f = $("editForm");
+      if (!(f && f.dataset.mac === s.mac && f.dataset.state === this.editState(s.mac))) {
+        $("main").innerHTML = this.renderEdit(s);
+      }
+    }
+  },
+  banners(){
+    let b = "";
+    if (!this.permOk) b += `<div class="banner err"><p>Les autorisations Bluetooth sont nécessaires pour trouver et piloter les simulateurs.</p><button class="hbtn txt" style="background:var(--brand2)" onclick="ble.requestPerms()">Autoriser</button></div>`;
+    else if (!this.btOn) b += `<div class="banner"><p>Le Bluetooth est désactivé.</p><button class="hbtn txt" style="background:var(--brand2)" onclick="ble.requestBt()">Activer</button></div>`;
+    return b;
+  },
+  renderDash(){
+    if (!this.store.sims.length) return `<div class="empty"><b>Aucun simulateur</b>Mettez un boîtier sous tension puis appuyez sur <b style="display:inline">＋</b> pour le rechercher et l'ajouter.<br><br><button class="btn" style="max-width:280px;margin:auto" onclick="app.openScan()">＋ Ajouter un simulateur</button></div>`;
+    return `<div class="legend">Appuyez sur un mode pour l'appliquer à la voie. Le bouton reste en surbrillance quand le boîtier a confirmé.</div>` +
+      this.store.sims.map(s => this.renderCard(s)).join("");
+  },
+  renderCard(s){
+    const r = this.rtOf(s.mac), c = r.cfg, st = r.st, ready = r.conn === "ready";
+    const nf = ready ? this.faults(s.mac) : 0;
+    let sub = [];
+    if (c && c.loc) sub.push(esc(c.loc));
+    if (c && s.alias && c.name && c.name !== s.alias) sub.push("boîtier « " + esc(c.name) + " »");
+    if (ready && st) sub.push("en service depuis " + fmtUp(st.up));
+    if (!ready) sub.push(r.conn === "connecting" ? "connexion…" : "hors ligne");
+    let body = "";
+    if (!ready) {
+      body = `<div class="msg ${r.conn==="connecting"?"":"warn"}">${r.conn==="connecting" ? "Connexion en cours…" : "Boîtier non joignable (éteint ou hors de portée). L'état des pannes sera relu à la reconnexion."}
+        ${r.conn==="offline"?`<button class="hbtn txt" style="background:var(--brand2);height:32px" onclick="app.reconnect('${s.mac}')">Réessayer</button>`:""}</div>`;
+    } else if (r.auth === false) {
+      body = `<div class="msg err">Code PIN refusé par le boîtier. <button class="hbtn txt" style="background:var(--force);height:32px" onclick="app.openEdit('${s.mac}')">Corriger</button></div>`;
+    } else if (c && !c.ok) {
+      body = `<div class="msg warn">Boîtier neuf : donnez-lui un nom et définissez ses voies. <button class="hbtn txt" style="background:var(--brand2);height:32px" onclick="app.openEdit('${s.mac}')">Configurer</button></div>`;
+    }
+    if (c && c.ok && r.auth !== false) {
+      const used = c.v.map((v,i) => ({...v,i})).filter(v => v.t !== "-");
+      if (!used.length) body += `<div class="msg">Aucune voie utilisée. Définissez les entrées / sorties dans la configuration.</div>`;
+      body += c.v.map((v,i) => {
+        if (v.t === "-") return `<div class="unused">Voie ${i+1} — non utilisée</div>`;
+        const m = st ? st.m[i] : -1, p = r.pend[i];
+        const btns = MODES.map((md,k) => `<button class="mb m${k} ${m===k?"on":""} ${p===k?"pend":""}" ${!ready||r.auth!==true?"disabled":""} onclick="app.setMode('${s.mac}',${i},${k})">${md.lb}</button>`).join("");
+        return `<div class="voie"><div class="vhead"><span class="vnum">VOIE ${i+1}</span><span class="tag ${v.t}">${v.t==="E"?"ENTRÉE":"SORTIE"}</span>
+          <span class="vid">${esc(v.id||"—")}</span><span class="vlb">${esc(v.lb)}</span></div>
+          <div class="modes">${btns}</div>
+          <div class="vstate">${m>=0 ? `État : <b class="m${m}">${MODES[m].st}</b> — ${MODES[m].desc}` : "État inconnu"}</div></div>`;
+      }).join("");
+    }
+    return `<div class="card ${nf?"fault":""} ${ready?"":"off"}">
+      <div class="chead"><span class="dot ${r.conn}"></span>
+        <div class="ctitle"><b>${esc(this.title(s.mac))}</b><span>${sub.join(" · ")}</span></div>
+        ${ready && c && c.ok ? `<span class="nfault ${nf?"":"zero"}">${nf ? nf+" panne"+(nf>1?"s":"") : "aucune panne"}</span>` : ""}
+        <button class="hbtn" style="background:#eef2f6;color:#33414e;height:34px;min-width:34px" onclick="app.cardMenu('${s.mac}')">⋮</button></div>
+      ${body}
+      <div class="cfoot"><button onclick="app.openEdit('${s.mac}')">Configurer</button>
+        <button ${ready?"":"disabled"} onclick="app.identify('${s.mac}')">Identifier</button>
+        <button ${ready&&nf?"":"disabled"} onclick="app.allNormal('${s.mac}')">Tout normal</button></div></div>`;
+  },
+  renderScan(){
+    const l = Object.values(this.scan.list).sort((a,b) => b.rssi - a.rssi);
+    let html = this.banners();
+    html += `<div class="legend">Les boîtiers <b>neufs</b> s'annoncent « SP-NEW-xxxx » (4 derniers caractères de leur adresse). Utilisez « Identifier » après l'ajout pour faire clignoter la LED du boîtier.</div>`;
+    if (!l.length) html += `<div class="empty"><b>${this.scan.on ? "Recherche en cours…" : "Aucun boîtier trouvé"}</b>Vérifiez que le simulateur est alimenté et à moins de 10 m.</div>`;
+    html += l.map(d => {
+      const known = !!this.sim(d.mac), isNew = /^SP-NEW-/.test(d.name);
+      const lvl = d.rssi > -60 ? 4 : d.rssi > -70 ? 3 : d.rssi > -80 ? 2 : 1;
+      const bars = [1,2,3,4].map(k => `<i class="${k<=lvl?"on":""}" style="height:${k*4}px"></i>`).join("");
+      return `<div class="dev" onclick="app.pickDevice('${d.mac}')"><div class="bars">${bars}</div>
+        <div class="info"><b>${esc(d.name)}</b><small>${d.mac} · ${d.rssi} dBm</small></div>
+        <span class="badge ${known?"known":isNew?"new":""}">${known?"déjà ajouté":isNew?"NEUF":"configuré"}</span></div>`;
+    }).join("");
+    $("main").innerHTML = html;
+  },
+  editState(mac){ const r = this.rtOf(mac); return `${r.conn}/${r.auth}/${r.cfg?JSON.stringify(r.cfg):""}`; },
+  renderEdit(s){
+    const r = this.rtOf(s.mac), c = r.cfg, can = r.conn === "ready" && r.auth === true && !!c;
+    const dis = can ? "" : "disabled";
+    let why = "";
+    if (r.conn !== "ready") why = r.conn === "connecting" ? "Connexion au boîtier en cours…" : "Boîtier hors ligne : la configuration du boîtier n'est pas modifiable.";
+    else if (r.auth === false) why = "Code PIN refusé : corrigez le code ci-dessus puis enregistrez.";
+    else if (!c) why = "Lecture de la configuration…";
+    const v = c ? c.v : [0,1,2,3].map(() => ({t:"-", id:"", lb:""}));
+    const vt = (t,i) => `<select id="vt${i}" ${dis} onchange="app.typeChanged(${i})">
+        <option value="-" ${t==="-"?"selected":""}>Non utilisée</option>
+        <option value="E" ${t==="E"?"selected":""}>Entrée automate (capteur → automate)</option>
+        <option value="S" ${t==="S"?"selected":""}>Sortie automate (automate → actionneur)</option></select>`;
+    return `<div id="editForm" data-mac="${s.mac}" data-state="${esc(this.editState(s.mac))}">
+      <div class="panel"><h2>Dans cette application</h2>
+        <label>Nom affiché (facultatif)</label><input id="eAlias" value="${esc(s.alias)}" placeholder="${esc(c?c.name:"")}">
+        <label>Code PIN utilisé pour piloter le boîtier</label><input id="ePin" inputmode="numeric" maxlength="8" value="${esc(s.pin)}">
+        <p class="hint">Adresse : ${s.mac}${c ? " · firmware " + esc(c.fw) : ""}</p></div>
+      <div class="panel"><h2>Configuration du boîtier (mise en service)</h2>
+        ${why ? `<div class="msg warn" style="margin:0 0 6px">${why}</div>` : ""}
+        <label>Nom du simulateur <span class="count">20 max.</span></label><input id="cName" ${dis} maxlength="20" value="${esc(c?c.name:"")}" placeholder="ex : Poste 3">
+        <label>Emplacement / système <span class="count">24 max.</span></label><input id="cLoc" ${dis} maxlength="24" value="${esc(c?c.loc:"")}" placeholder="ex : Ligne de tri">
+        <label>Durée max. d'un état en intermittence (s)</label><input id="cPer" ${dis} inputmode="decimal" value="${c?String(c.period/1000).replace(".",","):"2"}">
+        ${v.map((x,i) => `<div class="vcfg"><h3>Voie ${i+1} <span class="tag ${x.t}" id="vtag${i}" style="${x.t==="-"?"display:none":""}">${x.t==="E"?"ENTRÉE":"SORTIE"}</span></h3>
+          <label>Le relais est interposé sur</label>${vt(x.t,i)}
+          <div class="row"><div style="flex:0 0 38%"><label>Identifiant</label><input id="vi${i}" ${dis} maxlength="12" value="${esc(x.id)}" placeholder="${i%2?"%Q0.1":"%I0.2"}"></div>
+          <div><label>Libellé</label><input id="vl${i}" ${dis} maxlength="24" value="${esc(x.lb)}" placeholder="${i%2?"Vérin V1 sortie":"Capteur S1"}"></div></div></div>`).join("")}
+        <p class="hint">Câblage d'une voie : 1 = IN (source), 2 = OUT (destination), 3 = FLT (valeur forcée : 0 V, +24 V, résistance…).</p>
+      </div>
+      <button class="btn" onclick="app.saveAll()">Enregistrer</button>
+      <button class="btn sec" ${r.conn==="ready"?"":"disabled"} onclick="app.identify('${s.mac}')">💡 Identifier le boîtier (LED)</button>
+      <button class="btn sec" ${can?"":"disabled"} onclick="app.changePin()">🔑 Changer le code PIN du boîtier</button>
+      <button class="btn danger" onclick="app.askDelete('${s.mac}')">🗑️ Supprimer ce simulateur</button></div>`;
+  },
+  typeChanged(i){
+    const t = $("vt"+i).value, tag = $("vtag"+i);
+    tag.style.display = t === "-" ? "none" : "";
+    tag.className = "tag " + t; tag.textContent = t === "E" ? "ENTRÉE" : "SORTIE";
+  },
+
+  /* ---------- fenêtres ---------- */
+  modal(html){ $("sheet").innerHTML = html; $("modal").classList.add("show"); },
+  closeModal(){ $("modal").classList.remove("show"); },
+  confirm(title, text, ok, fn){
+    this._cfn = fn;
+    this.modal(`<h2>${esc(title)}</h2><p>${esc(text)}</p><div class="row"><button class="btn sec" onclick="app.closeModal()">Annuler</button>
+      <button class="btn danger" onclick="app.closeModal();app._cfn()">${esc(ok)}</button></div>`);
+  },
+  toast(m){ const t = $("toast"); t.textContent = m; t.style.display = "block"; clearTimeout(this._tt); this._tt = setTimeout(() => t.style.display = "none", 2600); }
+};
+
+/* Point d'entrée des événements Java : window.bleEvent('{"t":...}') */
+window.bleEvent = s => { try { app.onEvent(typeof s === "string" ? JSON.parse(s) : s); } catch(e){ console.error(e); } };
+
+/* =====================================================================
+   MockBLE : simulateurs fictifs pour tester l'interface dans un navigateur
+   (même protocole que le firmware). Inactif dans l'application Android.
+   ===================================================================== */
+class MockBLE {
+  constructor(){
+    const mk = (mac, name, loc, v) => ({mac, cfg:{name, loc, period:2000, v}, pin:"0000", m:[0,0,0,0], up:3600*Math.random()|0, conn:false, auth:false, inRange:true});
+    this.dev = {
+      "A0:B1:C2:00:11:22": mk("A0:B1:C2:00:11:22", "Poste 1", "Tri de pièces", [{t:"E",id:"%I0.2",lb:"Capteur présence S1"},{t:"S",id:"%Q0.4",lb:"Vérin éjecteur V1"},{t:"E",id:"%I0.5",lb:"Fin de course S3"},{t:"-",id:"",lb:""}]),
+      "A0:B1:C2:00:33:44": mk("A0:B1:C2:00:33:44", "Poste 2", "Station de pompage", [{t:"E",id:"%IW64",lb:"Niveau cuve 4-20 mA"},{t:"S",id:"%Q0.0",lb:"Pompe P1 (KM1)"},{t:"-",id:"",lb:""},{t:"-",id:"",lb:""}]),
+      "A0:B1:C2:00:5E:F7": mk("A0:B1:C2:00:5E:F7", "", "", [0,1,2,3].map(() => ({t:"-",id:"",lb:""})))
+    };
+    this.timers = [];
+  }
+  emit(o, d){ setTimeout(() => window.bleEvent(JSON.stringify(o)), d || 60); }
+  name(d){ return d.cfg.name ? "SP-" + d.cfg.name : "SP-NEW-" + d.mac.replace(/:/g,"").slice(-4); }
+  cfgStr(d){ const c = d.cfg; return ["CFG","1.0.0",d.mac,c.name?"1":"0",c.name,c.loc,c.period].concat(...c.v.map(v => [v.t,v.id,v.lb])).join("|"); }
+  stStr(d){ return ["ST",...d.m,d.up,1,d.cfg.name?"1":"0"].join("|"); }
+  loadData(){ return localStorage.getItem("spdemo") || JSON.stringify({version:1, sims:[{mac:"A0:B1:C2:00:11:22",alias:"",pin:"0000"},{mac:"A0:B1:C2:00:33:44",alias:"",pin:"0000"}]}); }
+  saveData(s){ localStorage.setItem("spdemo", s); }
+  startScan(ms){ Object.values(this.dev).forEach((d,i) => this.emit({t:"scan", mac:d.mac, name:this.name(d), rssi:-55-i*9}, 400+i*500)); this.emit({t:"scanend"}, ms); }
+  stopScan(){}
+  connect(mac, pin){
+    const d = this.dev[mac];
+    this.emit({t:"conn", mac, s:"connecting"}, 10);
+    if (!d || !d.inRange) return this.emit({t:"conn", mac, s:"offline", err:"délai dépassé"}, 1500);
+    d.conn = true; d.auth = pin === d.pin;
+    this.emit({t:"rsp", mac, d: d.auth ? "OK AUTH" : "ERR AUTH"}, 700);
+    this.emit({t:"cfg", mac, d:this.cfgStr(d)}, 750);
+    this.emit({t:"st", mac, d:this.stStr(d)}, 800);
+    this.emit({t:"conn", mac, s:"ready"}, 820);
+  }
+  disconnect(mac){ const d = this.dev[mac]; if (d) d.conn = false; this.emit({t:"conn", mac, s:"offline"}, 50); }
+  refresh(mac){ const d = this.dev[mac]; if (!d) return; this.emit({t:"cfg", mac, d:this.cfgStr(d)}); this.emit({t:"st", mac, d:this.stStr(d)}, 120); }
+  command(mac, cmd){
+    const d = this.dev[mac]; if (!d) return;
+    const a = cmd.trim().split(/\s+/), c = a[0].toUpperCase();
+    let r = "ERR INCONNUE", stc = false;
+    if (c === "IDENT") r = "OK IDENT";
+    else if (!d.auth) r = "ERR AUTH REQUISE";
+    else if (c === "SET") { d.m[+a[1]-1] = +a[2]; r = `OK SET ${a[1]} ${a[2]}`; stc = true; }
+    else if (c === "ALL") { d.m = d.m.map((x,i) => d.cfg.v[i].t !== "-" || +a[1] === 0 ? +a[1] : x); r = "OK ALL " + a[1]; stc = true; }
+    else if (c === "PIN") { d.pin = a[1]; r = "OK PIN"; }
+    else if (c === "RESETCFG") { d.cfg = {name:"", loc:"", period:2000, v:[0,1,2,3].map(() => ({t:"-",id:"",lb:""}))}; d.m=[0,0,0,0]; d.pin="0000"; r = "OK RESETCFG"; stc = true; }
+    this.emit({t:"rsp", mac, d:r}, 250);
+    if (stc) this.emit({t:"st", mac, d:this.stStr(d)}, 300);
+  }
+  writeConfig(mac, s){
+    const d = this.dev[mac]; if (!d) return;
+    if (!d.auth) return this.emit({t:"rsp", mac, d:"ERR AUTH REQUISE"});
+    const f = s.split("|");
+    d.cfg = {name:f[0], loc:f[1], period:+f[2], v:[0,1,2,3].map(i => ({t:f[3+3*i], id:f[4+3*i], lb:f[5+3*i]}))};
+    d.cfg.v.forEach((v,i) => { if (v.t === "-") d.m[i] = 0; });
+    this.emit({t:"rsp", mac, d:"OK CFG"}, 300);
+  }
+  getStatus(){ return "{\"perm\":true,\"bt\":true}"; }
+  requestBt(){} requestPerms(){} vibrate(){}
+}
+
+app.init();
+</script>
+</body>
+</html>

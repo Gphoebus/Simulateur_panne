@@ -1,0 +1,3 @@
+(sym_lib_table
+  (lib (name "Simulateur_panne")(type "KiCad")(uri "${KIPRJMOD}/Simulateur_panne.kicad_sym")(options "")(descr "Symboles du projet"))
+)
